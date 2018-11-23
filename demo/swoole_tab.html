@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+<meta charset="UTF-8">
+<script type="text/javascript" src="http://static.xuemao.com/xuemao/dist/src/js/libs/jquery-1.10.1.min.js"></script>
+<script type="text/javascript">
+//document.cookie = name + "=" + '卢进波'+Math.round(Math.random()*9+1);
+setCookie('login_name',randomString());
+
+var exampleSocket = new WebSocket("ws://172.16.3.9:9501");
+var msg = '{ "user_name": "lujinbo@ucse.net", "real_name": "'+getCookie('login_name')+'" ,"message":"亲爱的服务器！我连上你啦！","act":"login"}'; 
+exampleSocket.onopen = function (event) {
+	//console.log(event);
+	exampleSocket.send(msg); 
+};
+exampleSocket.onmessage = function (event) {
+	console.log(event.data);
+	var str_message = $("#message").html();
+	var strFormHtml = str_message+'<br/>'+event.data;
+	$("#message").html(strFormHtml);
+};
+// exampleSocket.onclose = function (event) {
+//   console.log(event.data);
+// }
+function createJson()
+{
+	var message = document.getElementById('content').value;
+	var msg = '{ "user_name": "lujinbo@ucse.net", "real_name": "'+getCookie('login_name')+'" ,"message":"'+message+'"}'; 
+
+	return msg
+}
+
+function setCookie(name,value)
+{
+	var Days = 30;
+	var exp = new Date();
+	exp.setTime(exp.getTime() + Days*24*60*60*1000);
+	document.cookie = name + "="+ escape (value) + ";expires=" + exp.toGMTString();
+}
+
+function getCookie(name)
+{
+	var arr,reg=new RegExp("(^| )"+name+"=([^;]*)(;|$)");
+	if(arr=document.cookie.match(reg))
+		return unescape(arr[2]);
+	else
+		return null;
+}
+
+function randomString(len)
+{
+	len = len || 6;
+	var $chars = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678';    /****默认去掉了容易混淆的字符oOLl,9gq,Vv,Uu,I1****/
+	var maxPos = $chars.length;
+	var pwd = '';
+	for (i = 0; i < len; i++) {
+		pwd += $chars.charAt(Math.floor(Math.random() * maxPos));
+	}
+	return '用户'+pwd;
+}
+
+var txt = document.getElementById("content"); 
+txt.style.position=absolute;
+txt.style.top=txt.scrollHeight; 
+
+</script>
+</head>
+<body>
+
+
+<div style="float:left;border:1px solid #000; width:500px;max-width: 500px;min-height: 500px; padding: 20px;">
+<div id="message" style="overflow-y:scroll;height: 300px;">
+</div>
+<textarea rows="5" cols="50" style="margin-top:95px; width:420px;" name="content" id="content"></textarea>
+<button  onclick="exampleSocket.send(createJson())">发送</button>
+</div>
+
+
+</body>
+</html>
+
